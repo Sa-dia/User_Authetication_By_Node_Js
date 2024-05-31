@@ -6,6 +6,7 @@ import Dashboard from './superuser/Dashboard';
 import Register from './superuser/Register';
 import CSVUpload from './superuser/upload_csv/CSVUpload';
 import CsvToXmlUploader from './superuser/upload_csv_xml/CsvToXmlUploader';
+import CsvToXmlRoom from './superuser/upload_csv_xml/CsvToXmlRoom'
 function App() {
     return (
         <AuthProvider>
@@ -14,6 +15,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/csv-upload" element={<CSVUpload />} />
                     <Route path="/csv-upload-xml" element={<CsvToXmlUploader />} />
+                    <Route path="/CsvToXmlRoom" element={<CsvToXmlRoom/>}/>
                     <Route path="/register" element={<Register />} />
                     <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
                     <Route path="*" element={<Navigate to="/login" />} />

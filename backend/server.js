@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.text({ type: 'application/xml' })); // Add this line to handle XML content type
+app.use(bodyParser.text({ type: 'application/xml' }));
 app.use(fileUpload());
 
 // MySQL connection
@@ -35,9 +35,28 @@ db.connect((err) => {
     console.log('Connected to MySQL database');
 
     // Create tables if they do not exist
+    createSuperUserTable();
     createCsvDataTable();
-    createXmlDataTable();
+    createXmlDataRoomTable();
 });
+
+// Function to create Super User table if it does not exist
+const createSuperUserTable = () => {
+    const query = `
+        CREATE TABLE IF NOT EXISTS super_user (
+            su_id VARCHAR(50) NOT NULL,
+            password VARCHAR(700) NOT NULL,
+            PRIMARY KEY (su_id)
+        )
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error creating super_user table:', err);
+            throw err;
+        }
+        console.log('Super User table created or already exists');
+    });
+};
 
 // Function to create CSV data table if it does not exist
 const createCsvDataTable = () => {
@@ -58,14 +77,14 @@ const createCsvDataTable = () => {
     });
 };
 
-// Function to create XML data table if it does not exist
-const createXmlDataTable = () => {
+// Function to create XML data table for rooms if it does not exist
+const createXmlDataRoomTable = () => {
     const query = `
         CREATE TABLE IF NOT EXISTS xml_data (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            column1 VARCHAR(255),
-            column2 VARCHAR(255),
-            column3 VARCHAR(255)
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            Room_No VARCHAR(255),
+            Room_Type VARCHAR(255),
+            Room_Capacity INT
         )
     `;
     db.query(query, (err, results) => {
@@ -186,7 +205,6 @@ const clearTable = (tableName) => {
 // Function to insert a single row into MySQL database
 const insertRowIntoDatabase = (tableName, data) => {
     return new Promise((resolve, reject) => {
-        // Adjust the query and parameters based on your CSV structure
         const query = `INSERT INTO ${tableName} (column1, column2, column3) VALUES (?, ?, ?)`;
         db.query(query, [data.column1, data.column2, data.column3], (err, results) => {
             if (err) {
@@ -228,10 +246,45 @@ app.post('/upload-xml', (req, res) => {
     });
 });
 
-const insertXmlRowIntoDatabase = (data) => {
+// Endpoint to handle room XML data upload and database insertion
+app.post('/room_xml', (req, res) => {
+    const xmlData = req.body;
+    console.log('Received XML Data:', xmlData); // Log incoming data for debugging
+
+    xml2js.parseString(xmlData, async (err, result) => {
+        if (err) {
+            console.error('Error parsing XML:', err);
+            return res.status(400).send('Invalid XML data');
+        }
+
+        const rows = result.root.row;
+        try {
+            await clearTable('xml_data');
+            for (const row of rows) {
+                var Id=row.Id && row.Id[0];
+                const roomNo = row.Room_No && row.Room_No[0];
+                const roomType = row.Room_type && row.Room_type[0];
+                const roomCapacity = row.Room_Capacity && row.Room_Capacity[0];
+
+                if (roomNo && roomType && roomCapacity) {
+                    await insertXmlRoomIntoDatabase(row);
+                } else {
+                    console.warn('Skipping incomplete row:', row);
+                }
+            }
+            res.status(200).send('XML data imported successfully.');
+        } catch (error) {
+            console.error('Error importing XML data:', error);
+            res.status(500).send('Error importing XML data.');
+        }
+    });
+});
+
+// Function to insert a single row into the xml_data table
+const insertXmlRowIntoDatabase = (row) => {
     return new Promise((resolve, reject) => {
-        const query = 'INSERT INTO xml_data (column1, column2, column3) VALUES (?, ?, ?)';
-        db.query(query, [data.column1[0], data.column2[0], data.column3[0]], (err, results) => {
+        const query = `INSERT INTO xml_data (column1, column2, column3) VALUES (?, ?, ?)`;
+        db.query(query, [row.column1[0], row.column2[0], row.column3[0]], (err, results) => {
             if (err) {
                 reject(err);
             } else {
@@ -241,6 +294,31 @@ const insertXmlRowIntoDatabase = (data) => {
     });
 };
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Function to insert room data into the xml_data table
+const insertXmlRoomIntoDatabase = (row) => {
+    return new Promise((resolve, reject) => {
+        const query = 'INSERT INTO xml_data (Id,Room_No, Room_Type, Room_Capacity) VALUES (?,?, ?, ?)';
+        db.query(query, [row.Id[0],row.Room_No[0], row.Room_type[0], row.Room_Capacity[0]], (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
+
+const startServer = (port) => {
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.warn(`Port ${port} is in use, trying another port...`);
+            startServer(port + 1);
+        } else {
+            throw err;
+        }
+    });
+};
+
+startServer(PORT);
