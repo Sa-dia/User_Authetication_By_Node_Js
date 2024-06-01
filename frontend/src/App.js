@@ -7,6 +7,8 @@ import Register from './superuser/Register';
 import CSVUpload from './superuser/upload_csv/CSVUpload';
 import CsvToXmlUploader from './superuser/upload_csv_xml/CsvToXmlUploader';
 import CsvToXmlRoom from './superuser/upload_csv_xml/CsvToXmlRoom'
+import CsvToXmlTeacher from './superuser/upload_csv_xml/CsvToXmlTeacher'
+import CsvToXmlStudent from './superuser/upload_csv_xml/CsvToXmlStudent'
 function App() {
     return (
         <AuthProvider>
@@ -18,6 +20,7 @@ function App() {
                     <Route path="/CsvToXmlRoom" element={<CsvToXmlRoom/>}/>
                     <Route path="/register" element={<Register />} />
                     <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                    <Route path="/CsvToXmlTeacher" element={<CsvToXmlTeacher/>}/>
                     <Route path="*" element={<Navigate to="/login" />} />
                 </Routes>
             </Router>

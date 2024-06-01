@@ -37,7 +37,10 @@ db.connect((err) => {
     // Create tables if they do not exist
     createSuperUserTable();
     createCsvDataTable();
+    // createXmlDataTable();
     createXmlDataRoomTable();
+    createXmlDataTeacherTable();
+    createXmlDataStudentTable();
 });
 
 // Function to create Super User table if it does not exist
@@ -76,11 +79,29 @@ const createCsvDataTable = () => {
         console.log('CSV data table created or already exists');
     });
 };
+// Function to create XML data table  if it does not exist
+const createXmlDataTable = () => {
+    const query = `
+        CREATE TABLE IF NOT EXISTS csv_data (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            column1 VARCHAR(255),
+            column2 VARCHAR(255),
+            column3 VARCHAR(255)
+        )
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error creating csv_data table:', err);
+            throw err;
+        }
+        console.log('CSV data table created or already exists');
+    });
+};
 
 // Function to create XML data table for rooms if it does not exist
 const createXmlDataRoomTable = () => {
     const query = `
-        CREATE TABLE IF NOT EXISTS xml_data (
+        CREATE TABLE IF NOT EXISTS xml_Room_data (
             Id INT AUTO_INCREMENT PRIMARY KEY,
             Room_No VARCHAR(255),
             Room_Type VARCHAR(255),
@@ -89,10 +110,45 @@ const createXmlDataRoomTable = () => {
     `;
     db.query(query, (err, results) => {
         if (err) {
-            console.error('Error creating xml_data table:', err);
+            console.error('Error creating xml_Room_data table:', err);
             throw err;
         }
-        console.log('XML data table created or already exists');
+        console.log('XML data Room table created or already exists');
+    });
+};
+const createXmlDataTeacherTable = () => {
+    const query = `
+        CREATE TABLE IF NOT EXISTS xml_teacher_data (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            Teacher_Name VARCHAR(255),
+            Designation VARCHAR(255),
+            Department VARCHAR(255)
+        )
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error creating xml_teacher_data table:', err);
+            throw err;
+        }
+        console.log('XML data teacher table created or already exists');
+    });
+};
+const createXmlDataStudentTable = () => {
+    const query = `
+        CREATE TABLE IF NOT EXISTS xml_student_data (
+            Id INT AUTO_INCREMENT PRIMARY KEY,
+            Stu_Name VARCHAR(255),
+            Stu_Roll VARCHAR(255),
+            Stu_Email VARCHAR(255),
+            Stu_Dept VARCHAR(255)
+        )
+    `;
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error creating xml_student_data table:', err);
+            throw err;
+        }
+        console.log('XML data student table created or already exists');
     });
 };
 
@@ -259,7 +315,7 @@ app.post('/room_xml', (req, res) => {
 
         const rows = result.root.row;
         try {
-            await clearTable('xml_data');
+            await clearTable('xml_Room_data');
             for (const row of rows) {
                 var Id=row.Id && row.Id[0];
                 const roomNo = row.Room_No && row.Room_No[0];
@@ -268,6 +324,71 @@ app.post('/room_xml', (req, res) => {
 
                 if (roomNo && roomType && roomCapacity) {
                     await insertXmlRoomIntoDatabase(row);
+                } else {
+                    console.warn('Skipping incomplete row:', row);
+                }
+            }
+            res.status(200).send('XML data imported successfully.');
+        } catch (error) {
+            console.error('Error importing XML data:', error);
+            res.status(500).send('Error importing XML data.');
+        }
+    });
+});
+app.post('/teacher_xml', (req, res) => {
+    const xmlData = req.body;
+    console.log('Received XML Data:', xmlData); // Log incoming data for debugging
+
+    xml2js.parseString(xmlData, async (err, result) => {
+        if (err) {
+            console.error('Error parsing XML:', err);
+            return res.status(400).send('Invalid XML data');
+        }
+
+        const rows = result.root.row;
+        try {
+            await clearTable('xml_teacher_data');
+            for (const row of rows) {
+                var Id=row.Id && row.Id[0];
+                const Teacher_Name = row.Teacher_Name && row.Teacher_Name[0];
+                const Designation = row.Designation && row.Designation[0];
+                const  Department = row.Department && row.Department[0];
+
+                if (Teacher_Name &&  Designation && Department) {
+                    await insertXmlTeacherIntoDatabase(row);
+                } else {
+                    console.warn('Skipping incomplete row:', row);
+                }
+            }
+            res.status(200).send('XML data imported successfully.');
+        } catch (error) {
+            console.error('Error importing XML data:', error);
+            res.status(500).send('Error importing XML data.');
+        }
+    });
+});
+app.post('/student_xml', (req, res) => {
+    const xmlData = req.body;
+    console.log('Received XML Data:', xmlData); // Log incoming data for debugging
+
+    xml2js.parseString(xmlData, async (err, result) => {
+        if (err) {
+            console.error('Error parsing XML:', err);
+            return res.status(400).send('Invalid XML data');
+        }
+
+        const rows = result.root.row;
+        try {
+            await clearTable('xml_student_data');
+            for (const row of rows) {
+                var Id=row.Id && row.Id[0];
+                const Stu_Name = row.Stu_Name && row.Stu_Name[0];
+                const Stu_Roll = row.Stu_Roll && row.Stu_Roll[0];
+                const Stu_Email= row.Stu_Email && row.Stu_Email[0];
+                const Stu_Dept=row.Stu_Dept && row.Stu_Dept[0];
+
+                if (Stu_Name &&  Stu_Roll && Stu_Email && Stu_Dept) {
+                    await insertXmlStudentIntoDatabase(row);
                 } else {
                     console.warn('Skipping incomplete row:', row);
                 }
@@ -297,8 +418,32 @@ const insertXmlRowIntoDatabase = (row) => {
 // Function to insert room data into the xml_data table
 const insertXmlRoomIntoDatabase = (row) => {
     return new Promise((resolve, reject) => {
-        const query = 'INSERT INTO xml_data (Id,Room_No, Room_Type, Room_Capacity) VALUES (?,?, ?, ?)';
+        const query = 'INSERT INTO xml_Room_data (Id,Room_No, Room_Type, Room_Capacity) VALUES (?,?, ?, ?)';
         db.query(query, [row.Id[0],row.Room_No[0], row.Room_type[0], row.Room_Capacity[0]], (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
+const insertXmlTeacherIntoDatabase = (row) => {
+    return new Promise((resolve, reject) => {
+        const query = 'INSERT INTO xml_teacher_data (Id,Teacher_Name, Designation, Department) VALUES (?,?, ?, ?)';
+        db.query(query, [row.Id[0],row.Teacher_Name[0], row.Designation[0], row.Department[0]], (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
+const insertXmlStudentIntoDatabase = (row) => {
+    return new Promise((resolve, reject) => {
+        const query = 'INSERT INTO xml_student_data (Id,Stu_Name,Stu_Roll,Stu_Email,Stu_Dept) VALUES (?,?, ?, ?,?)';
+        db.query(query, [row.Id[0],row.Stu_Name[0], row.Stu_Roll[0], row.Stu_Email[0],row.Stu_Dept[0]], (err, results) => {
             if (err) {
                 reject(err);
             } else {

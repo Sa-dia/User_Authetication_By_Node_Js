@@ -3,13 +3,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import CsvToXmlRoom from './superuser//upload_csv_xml/CsvToXmlRoom'
+import CsvToXmlRoom from './superuser/upload_csv_xml/CsvToXmlRoom'
+import CsvToXmlTeacher from './superuser/upload_csv_xml/CsvToXmlTeacher'
+import CsvToXmlStudent from './superuser/upload_csv_xml/CsvToXmlStudent'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     {/* <App /> */}
-    <CsvToXmlRoom/>
+    {/* <CsvToXmlRoom/> */}
+    {/* <CsvToXmlTeacher/> */}
+    <CsvToXmlStudent/>
   </React.StrictMode>
 );
 
