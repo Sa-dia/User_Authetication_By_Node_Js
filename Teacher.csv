@@ -1,15 +1,15 @@
-Id,Teacher_Name,Designation,Department
-1,Dr. Jugal Krishna Das,Professor,CSE
-2,Dr. Mohammad Shorif Uddin,Professor,CSE
-3,Dr. Dr. Md. Sabbir Alam,Professor,Mathemetics
-4,Dr. Dr. Md. Tauhedul Azam,Associate Professor,Mathemetics
-5,Sania Sifat Miti,Associate Professor,URP
-6,Mst. Shamima Khanom,Associate Professor,Physics
-7,Md. Habibur Rahman,Associate Professor,Statistics and Data Science
-8,MD ADNAN AL NAHIAN,Assistant Professor,Economics
-9,Abu Sayef Md Muntaquimul Bari Chowdhuri,Associate Professor,Management Studies
-10,Sabina Yasmin,Lecturer,Statistics and Data Science
-11,Md. Shawkat Ali,Professor,Economics
-12,Dr. Md. Imdadul Islam,Professor,Computer Science and Engineering
-13,Dr. Abu Sayed Md. Mostafizur Rahaman,Professor,CSE
-14,Samsun Nahar Khandakar,Lecturer,CSE
+Id,Teacher_Name,Designation,Department,Email
+1,Dr. Jugal Krishna Das,Professor,CSE,j@gmail.com
+2,Dr. Mohammad Shorif Uddin,Professor,CSE,m@gmail.com
+3,Dr. Dr. Md. Sabbir Alam,Professor,Mathemetics,s@gmail.com
+4,Dr. Dr. Md. Tauhedul Azam,Associate Professor,Mathemetics,t@gmail.com
+5,Sania Sifat Miti,Associate Professor,URP,sa@gmail.com
+6,Mst. Shamima Khanom,Associate Professor,Physics,sh@gmail.com
+7,Md. Habibur Rahman,Associate Professor,Statistics and Data Science,h@gmail.com
+8,MD ADNAN AL NAHIAN,Assistant Professor,Economics,a@gmail.com
+9,Abu Sayef Md Muntaquimul Bari Chowdhuri,Associate Professor,Management Studies,ab@gmail.com
+10,Sabina Yasmin,Lecturer,Statistics and Data Science,sab@gmail.com
+11,Md. Shawkat Ali,Professor,Economics,sha@gmail.com
+12,Dr. Md. Imdadul Islam,Professor,Computer Science and Engineering,i@gmail.com
+13,Dr. Abu Sayed Md. Mostafizur Rahaman,Professor,CSE,c@gmail.com
+14,Samsun Nahar Khandakar,Lecturer,CSE,k@gmail.com

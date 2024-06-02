@@ -122,7 +122,8 @@ const createXmlDataTeacherTable = () => {
             Id INT AUTO_INCREMENT PRIMARY KEY,
             Teacher_Name VARCHAR(255),
             Designation VARCHAR(255),
-            Department VARCHAR(255)
+            Department VARCHAR(255),
+            Email VARCHAR(255)
         )
     `;
     db.query(query, (err, results) => {
@@ -353,8 +354,9 @@ app.post('/teacher_xml', (req, res) => {
                 const Teacher_Name = row.Teacher_Name && row.Teacher_Name[0];
                 const Designation = row.Designation && row.Designation[0];
                 const  Department = row.Department && row.Department[0];
+                const Email=row.Email && row.Email[0];
 
-                if (Teacher_Name &&  Designation && Department) {
+                if (Teacher_Name &&  Designation && Department && Email) {
                     await insertXmlTeacherIntoDatabase(row);
                 } else {
                     console.warn('Skipping incomplete row:', row);
@@ -430,8 +432,8 @@ const insertXmlRoomIntoDatabase = (row) => {
 };
 const insertXmlTeacherIntoDatabase = (row) => {
     return new Promise((resolve, reject) => {
-        const query = 'INSERT INTO xml_teacher_data (Id,Teacher_Name, Designation, Department) VALUES (?,?, ?, ?)';
-        db.query(query, [row.Id[0],row.Teacher_Name[0], row.Designation[0], row.Department[0]], (err, results) => {
+        const query = 'INSERT INTO xml_teacher_data (Id,Teacher_Name, Designation, Department,Email) VALUES (?,?, ?, ?,?)';
+        db.query(query, [row.Id[0],row.Teacher_Name[0], row.Designation[0], row.Department[0],row.Email[0]], (err, results) => {
             if (err) {
                 reject(err);
             } else {
